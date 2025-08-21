@@ -8,6 +8,15 @@ from models import init_db
 import requests as rq
 
 
+class AddTask(BaseModel):
+    tg_id: int
+    title: str
+    
+
+class CompletedTask(BaseModel):
+    id: int
+
+
 @asynccontextmanager
 async def lifespan(app_: FastAPI):
     await init_db()
@@ -18,11 +27,15 @@ async def lifespan(app_: FastAPI):
 app = FastAPI(title="ToDoList", lifespan=lifespan)
 
 app.add_middleware(
-    CORSMiddleware,          # разрешаем всем доступ к API
-    allow_origins=["*"],     # url разрешенных сайтов
-    allow_credentials=True,  # разрешаем отправлять куки
-    allow_methods=["*"],     # разрешенные методы
-    allow_headers=["*"],     # разрешенные заголовки
+    CORSMiddleware,
+    allow_origins=[
+        "https://todoapp-fed26.web.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -39,6 +52,15 @@ async def main(tg_id: int):
     return {
         'completedTasks': completed_tasks_count
     }
+    
+@app.post('/api/add')
+async def add(task: AddTask):
+    user = await rq.add_user(task.tg_id)
+    await rq.add_task(user.id, task.title)
+    return {'status': 'ok'}
 
 
-
+@app.patch('/api/completed')
+async def completed(task: CompletedTask):
+    await rq.complete_task(task.id)
+    return {'status': 'ok'}
