@@ -1,0 +1,32 @@
+[Unit]
+Description=ToDo FastAPI (uvicorn)
+After=network.target
+
+[Service]
+# от какого пользователя запускать — лучше выделенный непривилегированный
+User=www-data
+Group=www-data
+
+# где лежит проект
+WorkingDirectory=/opt/todoapp
+
+# активируем venv через переменную PATH
+Environment="PATH=/opt/todoapp/.venv/bin"
+# если нужны переменные окружения — добавляй:
+# Environment="APP_ENV=production" "LOG_LEVEL=info"
+
+# команда запуска
+ExecStart=/opt/todoapp/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000 --workers 2
+
+# перезапуск при падении
+Restart=always
+RestartSec=5
+
+# ограничения/безопасность (по желанию — включай по мере необходимости)
+# NoNewPrivileges=yes
+# ProtectSystem=full
+# ProtectHome=true
+# PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

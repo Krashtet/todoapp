@@ -39,7 +39,7 @@ async def get_tasks(user_id: int):
 async def get_completed_tasks_count(user_id: int):
     async with async_session() as session:
         return await session.scalar(
-            select(func.count(Task.id)).where(Task.completed == True)
+            select(func.count(Task.id)).where(Task.user == user_id, Task.completed == True)
         )
     
     
@@ -54,6 +54,11 @@ async def update_task(task_id: int):
     async with async_session() as session:
         await session.execute(update(Task).where(Task.id == task_id).values(completed=True))
         await session.commit()
+    
+
+async def complete_task(task_id: int):
+    await update_task(task_id)
+    
     
 
 

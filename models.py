@@ -19,7 +19,6 @@ class User(Base):
     tg_id: Mapped[int] = mapped_column(BigInteger)
     
     
-    
 class Task(Base):
     __tablename__ = "tasks"
     
@@ -27,8 +26,7 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(128))
     completed: Mapped[bool] = mapped_column(default=False)
     user: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    
-    
+     
     
 async def init_db():
     async with engine.begin() as conn:
